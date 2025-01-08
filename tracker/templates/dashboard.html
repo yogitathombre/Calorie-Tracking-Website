@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - CalTrack</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">CalTrack</div>
+        <div class="nav-links">
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{%url 'food_item_list'%}">food_item_list</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="user-profile">
+            <h2>User Profile</h2>
+            <form method="POST" action="{% url 'dashboard' %}">
+                {% csrf_token %}
+                {{ form.as_p }} 
+                <div>
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" required>
+                </div>
+                <div>
+                    <label for="weight">Current Weight (kg):</label>
+                    <input type="number" id="weight" name="weight" required>
+                </div>
+                <div>
+                    <label for="goal_weight">Goal Target Weight (kg):</label>
+                    <input type="number" id="goal_weight" name="goal_weight" required>
+                </div>
+                <div>
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="activity_level">Activity Level:</label>
+                    <select id="activity_level" name="activity_level" required>
+                        <option value="sedentary">Sedentary</option>
+                        <option value="active">Active</option>
+                        <option value="very_active">Very Active</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Calculate</button>
+            </form>
+            <div class="results">
+                <h3>Calculation Results</h3>
+                <p id="bmrResult">Your BMR: <span id="bmrValue">0</span> calories/day</p>
+                <p id="caloriesResult">Suggested Daily Intake: <span id="caloriesValue">0</span> calories</p>
+                <p id="bmiResult">Your BMI: <span id="bmiValue">0</span></p>
+            </div>
+        </div>
+        <div class="food-log">
+            <h2>Food Log</h2>
+            <form id="foodForm">
+                <div id="foodItemsContainer">
+                    <div class="food-item-row">
+                        <input type="text" class="food_item" placeholder="Food Item" required>
+                        <input type="number" class="calories" placeholder="Calories" required>
+                    </div>
+                </div>
+                <button type="button" id="addFoodItem" class="btn btn-secondary">Add Another Food Item</button>
+                <button type="submit" class="btn btn-primary">Submit Food Log</button>
+            </form>
+            <div class="food-results">
+                <h3>Food Items Added</h3>
+                <ul id="foodList"></ul>
+                <p>Total Calories Consumed: <span id="totalCalories">0</span></p>
+                <p>Remaining Calories: <span id="remainingCalories">0</span></p>
+            </div>
+       
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate BMI and daily calorie intake
+        function calculateResults() {
+            const age = parseFloat(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const goalWeight = parseFloat(document.getElementById('goal_weight').value);
+            const height = 1.75; // Example height in meters, you may want to add a height input
+            const gender = document.getElementById('gender').value;
+            const activityLevel = document.getElementById('activity_level').value;
+
+            // Calculate BMI
+            const bmi = (weight / (height * height)).toFixed(2);
+            document.getElementById('bmiValue').innerText = bmi;
+
+            // Calculate daily calorie intake based on BMR and activity level
+            let bmr;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height * 100) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height * 100) - (4.330 * age);
+            }
+
+            let activityMultiplier;
+            switch (activityLevel) {
+                case 'sedentary':
+                    activityMultiplier = 1.2;
+                    break;
+                case 'active':
+                    activityMultiplier = 1.55;
+                    break;
+                case 'very_active':
+                    activityMultiplier = 1.9;
+                    break;
+            }
+
+            const dailyCalories = (bmr * activityMultiplier).toFixed(0);
+            document.getElementById('caloriesValue').innerText = dailyCalories;
+        }
+
+        // Add event listener to calculate results on form submission
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            calculateResults();
+        });
+
+          // Predefined food items and their calorie values
+    const foodCalories = {
+        "apple": 52,
+        "banana": 89,
+        "chicken breast": 165,
+        "rice": 130,
+        "broccoli": 55,
+        "orange": 47,
+        "grapes": 69,
+        "carrot": 41,
+        "potato": 77,
+        "egg": 155,
+        "salmon": 206,
+        "tofu": 144,
+        "quinoa": 120,
+        "almonds": 576,
+        "peanut butter": 588,
+        "yogurt": 59,
+        "oatmeal": 71,
+        "spinach": 23,
+        "bell pepper": 31,
+        "cucumber": 16,
+        "zucchini": 17,
+        "pasta": 131,
+        "beef": 250,
+        "turkey": 135,
+        "shrimp": 99,
+        "cheese": 402,
+        "milk": 42,
+        "dark chocolate": 546,
+        "hummus": 166,
+        "cottage cheese": 98,
+        // Add more food items and their calorie values as needed
+    };
+
+        document.getElementById('foodForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            const foodItems = document.querySelectorAll('.food_item');
+            const calorieInputs = document.querySelectorAll('.calories');
+            
+            totalCalories = 0;
+            foodItems.forEach((item, index) => {
+                const foodItem = item.value;
+                const calories = parseFloat(calorieInputs[index].value);
+
+                // Add food item to the list
+                const foodList = document.getElementById('foodList');
+                const listItem = document.createElement('li');
+                listItem.textContent = `${foodItem}: ${calories} calories`;
+                foodList.appendChild(listItem);
+
+                // Update total calories
+                totalCalories += calories;
+            });
+  
+            document.getElementById('totalCalories').innerText = totalCalories;
+
+            // Update remaining calories
+            const suggestedCalories = parseFloat(document.getElementById('caloriesValue').innerText) || 0;
+            const remainingCalories = suggestedCalories - totalCalories;
+            document.getElementById('remainingCalories').innerText = remainingCalories;
+
+            // Clear input fields
+            document.querySelectorAll('.food_item').forEach(item => item.value = '');
+            document.querySelectorAll('.calories').forEach(cal => cal.value = '');
+        });
+
+        // Add functionality to add more food item rows
+        document.getElementById('addFoodItem').addEventListener('click', function() {
+            const foodItemsContainer = document.getElementById('foodItemsContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'food-item-row';
+            newRow.innerHTML = `
+                <input type="text" class="food_item" placeholder="Food Item" required>
+                <input type="number" class="calories" placeholder="Calories" required>
+            `;
+            foodItemsContainer.appendChild(newRow);
+        });
+
+        document.getElementById('foodItemsContainer').addEventListener('input', function(event) {
+            if (event.target.classList.contains('food_item')) {
+                const foodItem = event.target.value.toLowerCase();
+                const calorieInput = event.target.nextElementSibling; // Get the corresponding calorie input
+                calorieInput.value = foodCalories[foodItem] || ''; // Set calorie value or empty if not found
+            }
+        });
+
+    </script>
+</body>
+</html>

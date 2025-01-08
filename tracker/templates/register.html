@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CalTrack</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+    <style>
+    
+       
+    </style>
+    
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">CalTrack</div>
+        <div class="nav-links">
+            <a href="{% url 'landing' %}">Home</a>
+            <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Create Account</h2>
+            <p class="auth-subtitle">Start your health journey with CalTrack</p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST" class="auth-form" style="display: flex; flex-direction: column;">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="{{ form.username.id_for_label }}" style="margin-bottom: 5px; font-weight: bold;">{{ form.username.label }}</label>
+                      <!-- Add a class for styling if needed -->
+                      {{ form.username }} 
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="{{ form.email.id_for_label }}" style="margin-bottom: 5px; font-weight: bold;">{{ form.email.label }}</label>
+                      <!-- Add a class for styling if needed -->
+                      {{ form.email}} 
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="{{ form.password.id_for_label }}" style="margin-bottom: 5px; font-weight: bold;">{{ form.password.label }}</label>
+                     <!-- Add a class for styling if needed -->
+                     {{ form.password}} 
+                    {{ form.password.errors }}
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="{{ form.confirm_password.id_for_label }}" style="margin-bottom: 5px; font-weight: bold;">{{ form.confirm_password.label }}</label>
+                    <!-- Add a class for styling if needed -->
+                    {{ form.confirm_password }} 
+                    {{ form.confirm_password.errors }}
+                </div>
+
+                <button type="submit" style="padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Register</button>
+            </form>
+        </div>
+    </div>
+           
+    
+</body>
+</html>

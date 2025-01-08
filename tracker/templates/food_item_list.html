@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Item List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="food_item_list.html">Food Item List</a>
+    </nav>
+    <h1>Food Item List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Food Item</th>
+                <th>Calories</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ food_items }}
+        </tbody>
+    </table>
+
+    <script>
+        const foodCalories = {
+            "apple": 52,
+            "banana": 89,
+            "chicken breast": 165,
+            "rice": 130,
+            "broccoli": 55,
+            "orange": 47,
+            "grapes": 69,
+            "carrot": 41,
+            "potato": 77,
+            "egg": 155,
+            "salmon": 206,
+            "tofu": 144,
+            "quinoa": 120,
+            "almonds": 576,
+            "peanut butter": 588,
+            "yogurt": 59,
+            "oatmeal": 71,
+            "spinach": 23,
+            "bell pepper": 31,
+            "cucumber": 16,
+            "zucchini": 17,
+            "pasta": 131,
+            "beef": 250,
+            "turkey": 135,
+            "shrimp": 99,
+            "cheese": 402,
+            "milk": 42,
+            "dark chocolate": 546,
+            "hummus": 166,
+            "cottage cheese": 98,
+        };
+
+        const tbody = document.querySelector('tbody');
+        for (const [food, calories] of Object.entries(foodCalories)) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${food}</td><td>${calories}</td>`;
+            tbody.appendChild(row);
+        }
+    </script>
+</body>
+</html>
